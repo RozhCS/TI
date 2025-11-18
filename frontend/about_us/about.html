@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors" />
+    <meta name="generator" content="Astro v5.13.2" />
+    <title>Carousel Template · Bootstrap v5.3</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <meta name="theme-color" content="#712cf9" />
+    <style>
+      body {
+        padding-top: 56px;
+        background-color: #0f172a !important;
+      }
+      
+      [data-bs-theme="light"] body {
+        background-color: #ffffff !important;
+      }
+      
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+      
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: #0000001a;
+        border: solid rgba(0, 0, 0, 0.15);
+        border-width: 1px 0;
+        box-shadow: inset 0 0.5em 1.5em #0000001a, inset 0 0.125em 0.5em #00000026;
+      }
+      
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+      
+      .bi {
+        vertical-align: -0.125em;
+        fill: currentColor;
+      }
+      
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+      
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .btn-bd-primary {
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+      
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+      
+      .bd-mode-toggle .bi {
+        width: 1em;
+        height: 1em;
+      }
+
+      /* Back button hover effect */
+      .back-button {
+        border-radius: 50%;
+        color: white;
+        background-color: #212529;
+        border: none;
+        padding: 15px 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .back-button:hover {
+        background-color: #4f46e5;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+      }
+
+      .back-button:active {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
+      }
+      
+      /* Chat robot container - fully responsive */
+      .chat-robot-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 30px;
+        padding: 40px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #4f46e5, #1e293b);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        margin-bottom: 60px;
+      }
+      
+      .robot-text {
+        flex: 1;
+        color: #fff;
+      }
+      
+      .robot-text h1 {
+        font-size: clamp(1.75rem, 5vw, 3.5rem);
+        font-weight: bold;
+        margin-bottom: 15px;
+        line-height: 1.2;
+      }
+      
+      .robot-text p {
+        font-size: clamp(1rem, 2.5vw, 1.75rem);
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+      
+      /* Bot animation - fully responsive */
+      .bot-animation {
+        width: 100%;
+        max-width: 350px;
+        min-width: 200px;
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        flex-shrink: 0;
+      }
+      
+      .bot-animation video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      
+      /* Circle images - fully responsive */
+      .circle-image {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      
+      /* Feature images - fully responsive */
+      .feature-image {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      
+      /* Feature video - fully responsive - square like bot animation */
+      .feature-video {
+        width: 100%;
+        max-width: 500px;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        display: block;
+        margin: 0 auto;
+      }
+      
+      /* Marketing section */
+      .container.marketing {
+        margin-top: 60px;
+      }
+      
+      .container.marketing .row {
+        justify-content: center;
+      }
+      
+      .container.marketing .col-lg-4 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+      
+      /* Featurette sections */
+      .featurette {
+        margin-bottom: 60px;
+      }
+      
+      .featurette-divider {
+        margin: 60px 0;
+      }
+      
+      /* Tablet adjustments (768px - 991px) */
+      @media (max-width: 991px) {
+        .chat-robot-container {
+          padding: 30px;
+          gap: 25px;
+        }
+        
+        .bot-animation {
+          max-width: 280px;
+        }
+        
+        .feature-image,
+        .feature-video {
+          margin-bottom: 30px;
+        }
+        
+        .featurette {
+          margin-bottom: 50px;
+        }
+        
+        .featurette-divider {
+          margin: 50px 0;
+        }
+      }
+      
+      /* Mobile landscape and small tablets (576px - 767px) */
+      @media (max-width: 767px) {
+        .chat-robot-container {
+          flex-direction: column;
+          padding: 25px;
+          gap: 20px;
+        }
+        
+        .robot-text {
+          text-align: center;
+        }
+        
+        .robot-text h1 {
+          font-size: 2rem;
+        }
+        
+        .robot-text p {
+          font-size: 1.125rem;
+        }
+        
+        .bot-animation {
+          max-width: 250px;
+        }
+        
+        .circle-image {
+          max-width: 220px;
+        }
+        
+        .feature-image {
+          aspect-ratio: 16 / 9;
+          margin-bottom: 25px;
+        }
+        
+        .feature-video {
+          max-width: 350px;
+          margin-bottom: 25px;
+        }
+        
+        .container.marketing {
+          margin-top: 40px;
+        }
+        
+        .featurette {
+          margin-bottom: 40px;
+        }
+        
+        .featurette-divider {
+          margin: 40px 0;
+        }
+      }
+      
+      /* Small mobile devices (481px - 575px) */
+      @media (max-width: 575px) {
+        body {
+          padding-top: 56px;
+        }
+        
+        .chat-robot-container {
+          padding: 20px;
+          gap: 15px;
+          border-radius: 15px;
+        }
+        
+        .robot-text h1 {
+          font-size: 1.5rem;
+          margin-bottom: 10px;
+        }
+        
+        .robot-text p {
+          font-size: 1rem;
+        }
+        
+        .robot-text br {
+          display: none;
+        }
+        
+        .bot-animation {
+          max-width: 200px;
+        }
+        
+        .circle-image {
+          max-width: 180px;
+        }
+        
+        .feature-image {
+          aspect-ratio: 16 / 9;
+          border-radius: 15px;
+        }
+        
+        .feature-video {
+          max-width: 280px;
+          border-radius: 15px;
+        }
+        
+        .container.marketing {
+          margin-top: 30px;
+        }
+        
+        .container.marketing .col-lg-4 {
+          margin-bottom: 35px;
+        }
+        
+        .featurette {
+          margin-bottom: 35px;
+        }
+        
+        .featurette-divider {
+          margin: 35px 0;
+        }
+        
+        .featurette-heading {
+          font-size: 1.5rem;
+        }
+        
+        .lead {
+          font-size: 1rem;
+        }
+      }
+      
+      /* Extra small devices (320px - 480px) */
+      @media (max-width: 480px) {
+        .chat-robot-container {
+          padding: 15px;
+          gap: 12px;
+        }
+        
+        .robot-text h1 {
+          font-size: 1.25rem;
+        }
+        
+        .robot-text p {
+          font-size: 0.9rem;
+        }
+        
+        .bot-animation {
+          max-width: 170px;
+        }
+        
+        .circle-image {
+          max-width: 150px;
+        }
+        
+        .navbar-brand {
+          font-size: 0.9rem;
+        }
+        
+        .btn {
+          padding: 12px 18px;
+        }
+      }
+      
+      /* Very small devices (below 375px) */
+      @media (max-width: 374px) {
+        .chat-robot-container {
+          padding: 12px;
+        }
+        
+        .robot-text h1 {
+          font-size: 1.1rem;
+        }
+        
+        .robot-text p {
+          font-size: 0.85rem;
+        }
+        
+        .bot-animation {
+          max-width: 150px;
+        }
+        
+        .circle-image {
+          max-width: 130px;
+        }
+      }
+      
+      /* Large screens optimization */
+      @media (min-width: 1400px) {
+        .chat-robot-container {
+          padding: 50px;
+          gap: 40px;
+        }
+        
+        .bot-animation {
+          max-width: 400px;
+        }
+        
+        .circle-image {
+          max-width: 320px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+      <symbol id="check2" viewBox="0 0 16 16">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"></path>
+      </symbol>
+      <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"></path>
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"></path>
+        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"></path>
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"></path>
+      </symbol>
+    </svg>
+
+    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+      <button 
+        type="button" 
+        class="btn btn-outline-primary back-button" 
+        onclick="window.location.href='../index.html'"
+        data-bs-toggle="tooltip" 
+        data-bs-placement="left" 
+        title="Go back to TI BOT">
+        <i class="bi bi-arrow-return-left" style="font-size: 25px;"></i>
+      </button>
+    </div>
+
+    <header data-bs-theme="dark">
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #0f172a; border-bottom: 1px solid #1e293b;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">About us</a>
+          
+          <div class="dropdown bd-mode-toggle ms-auto">
+            <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+              <svg class="bi my-1 theme-icon-active" aria-hidden="true"><use href="#circle-half"></use></svg>
+              <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                  <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#sun-fill"></use></svg>
+                  Light
+                  <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                  <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#moon-stars-fill"></use></svg>
+                  Dark
+                  <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                  <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#circle-half"></use></svg>
+                  Auto
+                  <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <img src="../image/download (2).png" alt="Logo" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin:10px;">
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="container mt-5 pt-4">
+        <div class="chat-robot-container">
+          <div class="robot-text">
+            <h1>Hi! I'm TI-BOT</h1>
+            <br class="d-none d-md-block">
+            <p>I'm your new friend in university!</p>
+            <p>Don't ask anyone else - ask me...</p>
+          </div>
+          <div class="bot-animation">
+            <video src="../mp4/like.mp4" autoplay muted loop playsinline></video>
+          </div>
+        </div>
+      </div>
+
+      <div class="container marketing">
+        <div class="row">
+          <div class="col-lg-4">
+            <img src="../image/xom.jpg" alt="Nature" class="circle-image">
+            <h2 class="fw-normal mt-3">Aryan Abdullah</h2>
+            <pre style="font-size: 18px;">Student of Computer Engineering
+Software Developer</pre>
+          </div>
+          <div class="col-lg-4">
+            <img src="../image/mamosta.jpg" alt="Forest" class="circle-image">
+            <h2 class="fw-normal mt-3">Rozh Jaza</h2>
+           <pre style="font-size: 18px;">Assistant Researcher
+Software Developer</pre>
+          </div>
+          <div class="col-lg-4">
+            <img src="../image/rako1.jpg" alt="Ocean" class="circle-image">
+            <h2 class="fw-normal mt-3">Rako Omer</h2>
+            <pre style="font-size: 18px;">Student of Computer Engineering
+Software Developer</pre>
+          </div>
+        </div>
+
+        <hr class="featurette-divider" />
+
+        <div class="row featurette">
+          <div class="col-md-7 order-md-2">
+            <h2 class="featurette-heading fw-normal lh-1"> About us <span class="text-body-secondary"></span></h2>
+            <p class="lead" style="text-align: justify;">This project was built by Mr. Rozh Jaza (Assistant Researcher in Computer Engineering & IT Department) together with two talented students from the Computer Engineering Department – 3rd Grade: Rako Omer and Aryan Abdullah. Our goal is to introduce innovative technology to TIU-Sulaimani and enhance the educational experience with intelligent solutions.</p>
+            <p class="lead" style="text-align: justify;">TI-BOT is the first university AI assistant in Kurdistan Region, representing a step toward a smarter future and continuous technological growth at TIU-Sulaimani.</p>
+          </div>
+          <div class="col-md-5 order-md-1">
+            <img src="../image/xoman1.jpg" alt="Forest sunlight" class="feature-image">
+          </div>
+        </div>
+
+        <hr class="featurette-divider" />
+
+        <div class="row featurette">
+          <div class="col-md-7 order-md-1">
+            <br>
+            <h2 class="featurette-heading fw-normal lh-1"> What is TI-BOT <span class="text-body-secondary"> ?</span></h2>
+            <p class="lead" style="text-align: justify;">TI-BOT is an intelligent AI assistant designed to make campus life easier at Tishk International University – Sulaimani. It helps users quickly access essential information such as office locations, staff contacts, service departments, university details, and room navigation—all through a simple conversation. TI-BOT was developed to solve real daily challenges within the university by providing fast, accurate, and friendly support without needing to search or ask multiple people. This project was created and engineered by Mr. Rozh Jaza, together with Rako Omer and Aryan Abdullah, two passionate students from Computer Engineering 3rd grade, as part of bringing modern technology and innovation into TIU-Sulaimani.</p>
+          </div>
+          <div class="col-md-5 order-md-2">  
+            <video src="../mp4/who.mp4" autoplay muted loop playsinline class="feature-video"></video>
+          </div>
+        </div>
+
+        <hr class="featurette-divider" />
+      </div>
+
+      <footer class="container py-5">
+        <p class="float-end"><a href="#">Back to top</a></p>
+        <p>&copy; 2025 TI BOT &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+      </footer>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Initialize Bootstrap tooltips
+      document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+      });
+
+      // Theme switcher
+      (() => {
+        'use strict'
+        
+        const getStoredTheme = () => localStorage.getItem('theme')
+        const setStoredTheme = theme => localStorage.setItem('theme', theme)
+        
+        const getPreferredTheme = () => {
+          const storedTheme = getStoredTheme()
+          if (storedTheme) {
+            return storedTheme
+          }
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        
+        const setTheme = theme => {
+          if (theme === 'auto') {
+            document.documentElement.setAttribute('data-bs-theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          } else {
+            document.documentElement.setAttribute('data-bs-theme', theme)
+          }
+          showActiveTheme(theme)
+        }
+        
+        const showActiveTheme = (theme, focus = false) => {
+          const themeSwitcher = document.querySelector('#bd-theme')
+          if (!themeSwitcher) return
+          
+          const themeSwitcherText = document.querySelector('#bd-theme-text')
+          const activeThemeIcon = document.querySelector('.theme-icon-active use')
+          const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+          const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+          
+          document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+            element.classList.remove('active')
+            element.setAttribute('aria-pressed', 'false')
+          })
+          
+          btnToActive.classList.add('active')
+          btnToActive.setAttribute('aria-pressed', 'true')
+          activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+          const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
+          themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+          
+          if (focus) {
+            themeSwitcher.focus()
+          }
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          const storedTheme = getStoredTheme()
+          if (storedTheme !== 'light' && storedTheme !== 'dark') {
+            setTheme(getPreferredTheme())
+          }
+        })
+        
+        window.addEventListener('DOMContentLoaded', () => {
+          setTheme(getPreferredTheme())
+          
+          document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+              const theme = toggle.getAttribute('data-bs-theme-value')
+              setStoredTheme(theme)
+              setTheme(theme)
+            })
+          })
+        })
+      })()
+    </script>
+  </body>
+</html>

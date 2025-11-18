@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TI BOT</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  transition: background 0.3s, color 0.3s;
+}
+
+.app {
+  display: flex;
+  height: 100%;
+  position: relative;
+}
+
+/* Sidebar Overlay (Mobile only) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  background: #1e293b;
+  border-top-right-radius: 200px 300px;
+  border-bottom-right-radius: 200px 300px;
+  transform: translateX(10px);
+  pointer-events: none;
+}
+
+.sidebar button {
+  background-color: transparent;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 16px;
+  width: 100%;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.sidebar button:hover {
+  background-color: #334155;
+}
+
+.sidebar button i {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* Desktop: Collapsible sidebar */
+.sidebar.closed {
+  width: 70px;
+  align-items: center;
+  padding: 1rem 0.5rem;
+}
+
+.sidebar.closed button span {
+  display: none;
+}
+
+.sidebar.closed button {
+  justify-content: center;
+  padding: 0.6rem;
+}
+
+.sidebar.closed::before {
+  display: none;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid #334155;
+  padding-top: 1rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  width: 100%;
+}
+
+.sidebar.closed .sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar.closed .sidebar-footer > div:not(.footer-icons) {
+  display: none;
+}
+
+.footer-icons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Toggle Button */
+.toggle-sidebar-btn {
+  position: fixed;
+  top: 4px;
+  left: 10px;
+  background: #1e293b;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  z-index: 1100;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-sidebar-btn:hover {
+  background: #334155;
+}
+
+/* Create hamburger icon with lines */
+.toggle-sidebar-btn::before,
+.toggle-sidebar-btn::after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 2.5px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+}
+
+.toggle-sidebar-btn span {
+  display: block;
+  width: 20px;
+  height: 2.5px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+}
+
+body.light .toggle-sidebar-btn::before,
+body.light .toggle-sidebar-btn::after,
+body.light .toggle-sidebar-btn span {
+  background-color: #0f172a;
+}
+
+body.light .toggle-sidebar-btn {
+  background: whitesmoke;
+  color: #0f172a;
+}
+
+body.light .toggle-sidebar-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Chat area */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+  position: relative;
+  background-color: #0f172a;
+}
+
+.sidebar.closed ~ .chat-area {
+  margin-left: 70px;
+}
+
+/* Topbar */
+.topbar {
+  height: 65px;
+  padding: 0 1rem;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  background: #0f172a;
+  color: #e2e8f0;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+.hi {
+  position: absolute;
+  left: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.topbar .title-bold {
+  font-weight: bold;
+}
+
+.topbar .title-normal {
+  font-weight: normal;
+}
+
+.logo-container {
+  position: absolute;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-container img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-family: Arial, sans-serif;
+}
+
+.logo-text .text-bold {
+  font-weight: bold;
+}
+
+.logo-text .text-normal {
+  font-weight: normal;
+}
+
+/* Chat messages */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  padding-top: 380px;
+  padding-bottom: 100px;
+  scroll-behavior: smooth;
+  position: relative;
+  z-index: 600;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 700;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin: 0px 20%;
+  position: relative;
+}
+
+.message.user .bubble {
+  background-color: #2563eb;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.message.bot .bubble {
+  background-color: none;
+  color: #e2e8f0;
+  border-bottom-left-radius: 4px;
+}
+
+/* Speaker Icon */
+.speaker-icon {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #94a3b8;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.speaker-icon:hover {
+  color: #2563eb;
+}
+
+.speaker-icon.speaking {
+  color: #4ade80;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+body.light .speaker-icon {
+  color: #64748b;
+}
+
+body.light .speaker-icon:hover {
+  color: #2563eb;
+}
+
+/* Input area wrapper */
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  width: 60%;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s;
+  z-index: 800;
+}
+
+.input-wrapper #assistantHint {
+  text-align: center;
+  margin-bottom: 1px;
+  color: #94a3b8;
+  font-size: 25px;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+/* Input area */
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: none;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.input-area input {
+  flex: 1;
+  background: #1e293b;
+  border: none;
+  color: #e2e8f0;
+  padding: 0.75rem;
+  outline: none;
+  border-radius: 20px;
+}
+
+.input-area button {
+  background: #2563eb;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  padding: 0.6rem 1rem;
+}
+
+/* Mic Button */
+#micBtn {
+  background: #ff9500;
+  margin-right: 6px;
+}
+
+/* Voice Equalizer */
+.equalizer {
+  display: inline-flex;
+  gap: 4px;
+  height: 20px;
+}
+
+.equalizer span {
+  width: 4px;
+  background-color: #4ade80;
+  display: inline-block;
+  animation: equalize 0.5s infinite ease-in-out;
+}
+
+.equalizer span:nth-child(1) { animation-delay: 0s; }
+.equalizer span:nth-child(2) { animation-delay: 0.1s; }
+.equalizer span:nth-child(3) { animation-delay: 0.2s; }
+.equalizer span:nth-child(4) { animation-delay: 0.3s; }
+.equalizer span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes equalize {
+  0% { height: 4px; }
+  50% { height: 20px; }
+  100% { height: 4px; }
+}
+
+/* Light mode */
+body.light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+body.light .chat-area,
+body.light .topbar,
+body.light .input-area {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+body.light .bubble {
+  color: #0f172a;
+}
+
+body.light .message.user .bubble {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+body.light .message.bot .bubble {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+body.light .sidebar {
+  background-color: whitesmoke;
+}
+
+body.light .sidebar::before {
+  background: whitesmoke;
+}
+
+body.light .sidebar button {
+  color: #0f172a;
+}
+
+body.light .sidebar button:hover {
+  background-color: #e2e8f0;
+}
+
+body.light .logo-text {
+  color: #475569;
+}
+
+body.light #assistantHint {
+  color: black;
+}
+
+body.light .input-area input {
+  background: whitesmoke !important;
+  color: black !important;
+}
+
+/* BOT MP4 animation */
+.bot-animation {
+  position: fixed;
+  top: 31%;
+  left: calc(50% + 125px);
+  transform: translate(-50%, -50%);
+  width: 310px;
+  height: 310px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 900;
+  background: none;
+  border: 3px solid rgba(0, 0, 0, 0.15);
+  transition: left 0.3s ease;
+  cursor: pointer;
+}
+
+.sidebar.closed ~ .chat-area .bot-animation {
+  left: calc(50% + 35px);
+}
+
+.bot-animation video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 10px solid #1e293b;
+}
+
+.about-1 {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  z-index: 1200;
+  background-color: #1e293b;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.about-1 button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.about-1 img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+    width: 250px;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .sidebar.closed button span {
+    display: inline;
+  }
+
+  .sidebar.closed button {
+    justify-content: flex-start;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .sidebar.closed .sidebar-footer {
+    align-items: flex-start;
+  }
+
+  .sidebar.closed .sidebar-footer > div:not(.footer-icons) {
+    display: block;
+  }
+
+  .chat-area {
+    margin-left: 0 !important;
+  }
+
+  .hi {
+    left: 60px;
+  }
+
+  .bot-animation {
+    left: 50% !important;
+    width: 200px;
+    height: 200px;
+    top: 28%;
+  }
+
+  .sidebar.closed ~ .chat-area .bot-animation {
+    left: 50% !important;
+  }
+
+  .input-wrapper {
+    width: 90%;
+  }
+
+  .input-wrapper #assistantHint {
+    font-size: 18px;
+  }
+
+  .bubble {
+    max-width: 85%;
+    margin: 0px 5%;
+  }
+
+  .about-1 {
+    bottom: 20px;
+    right: 10px;
+  }
+
+  .chat-container {
+    padding-top: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bot-animation {
+    width: 150px;
+    height: 150px;
+  }
+
+  .input-wrapper #assistantHint {
+    font-size: 16px;
+  }
+
+  .topbar {
+    font-size: 14px;
+  }
+
+  .logo-container img {
+    width: 30px;
+    height: 30px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <button class="toggle-sidebar-btn" id="toggleSidebarBtn"><span></span></button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="sidebar closed" id="sidebar">
+    <br><br>
+    <button id="newChatBtn"><i class="bi bi-chat-dots"></i><span> New Chat</span></button>
+    <div id="chatHistory"></div>
+    <div class="sidebar-footer">
+      <div class="footer-icons">
+        <button id="themeBtn"><i class="bi bi-moon"></i><span> Dark Mode</span></button>
+        <button id="soundToggleBtn"><i class="bi bi-volume-up-fill"></i><span> Sound On</span></button>
+        <button onclick="window.location.href='./about_us/about.html'"><i class="bi bi-info-circle"></i><span> About Us</span></button>
+      </div>
+      <div class="mt-3" id="clearChatsBtn" style="cursor:pointer;">🗑️ Clear All Chats</div>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="topbar">
+      <div class="hi"><span class="title-bold" style="font-size: 25px;">TI</span><span class="title-normal" style="font-size: 25px;">-BOT</span></div>
+      <div class="logo-container">
+        <span class="logo-text"><span class="text-bold"></span><span class="text-normal"></span></span>
+        <img src="./image/download (2).png" alt="Logo">
+      </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer"></div>
+
+    <!-- Input Wrapper -->
+    <div class="input-wrapper">
+      <div id="assistantHint"></div>
+      <div class="input-area">
+        <input id="userInput" type="text" placeholder="Send a message..." />
+        <button id="micBtn"><i class="bi bi-mic-fill"></i></button>
+        <button id="sendBtn">Send</button>
+      </div>
+      <div id="voiceEqualizer" style="display:none; margin-top:6px; text-align:center;">
+        <div class="equalizer">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT MP4 animation container -->
+    <div class="bot-animation" id="botAnimation">
+      <video id="botVideo" src="./mp4/hi.mp4" autoplay muted loop></video>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+const chatContainer = document.getElementById("chatContainer");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const micBtn = document.getElementById("micBtn");
+const themeBtn = document.getElementById("themeBtn");
+const soundToggleBtn = document.getElementById("soundToggleBtn");
+const newChatBtn = document.getElementById("newChatBtn");
+const chatHistory = document.getElementById("chatHistory");
+const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+const sidebar = document.getElementById("sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+const clearChatsBtn = document.getElementById("clearChatsBtn");
+let chatCount = 1;
+
+const inputWrapper = document.querySelector(".input-wrapper");
+const assistantHint = document.getElementById("assistantHint");
+const assistantMessages = [
+  "How can I help you today?",
+  "What would you like to talk about?",
+  "Need assistance with something?"
+];
+
+let currentHintIndex = 0;
+
+// ✅ TEXT-TO-SPEECH SETUP
+let isSoundEnabled = localStorage.getItem("soundEnabled") !== "false"; // Default ON
+let currentSpeech = null;
+let availableVoices = [];
+let selectedVoice = null;
+
+// Load available voices
+function loadVoices() {
+  availableVoices = speechSynthesis.getVoices();
+
+  // Try to find a cute/feminine voice
+  // Priority: Female voices with higher quality
+  const preferredVoices = [
+    'Google UK English Female',
+    'Google US English Female',
+    'Microsoft Zira',
+    'Samantha',
+    'Victoria',
+    'Karen',
+    'Moira',
+    'Tessa',
+    'Fiona'
+  ];
+
+  // First, try to find preferred voices
+  for (let prefName of preferredVoices) {
+    selectedVoice = availableVoices.find(voice =>
+      voice.name.includes(prefName)
+    );
+    if (selectedVoice) break;
+  }
+
+  // If no preferred voice found, try to find any female voice
+  if (!selectedVoice) {
+    selectedVoice = availableVoices.find(voice =>
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('woman') ||
+      (voice.name.includes('Samantha')) ||
+      (voice.name.includes('Victoria')) ||
+      (voice.name.includes('Karen'))
+    );
+  }
+
+  // Fallback to default voice
+  if (!selectedVoice && availableVoices.length > 0) {
+    selectedVoice = availableVoices[0];
+  }
+
+  console.log('Selected voice:', selectedVoice ? selectedVoice.name : 'Default');
+}
+
+// Load voices on page load and when they change
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// Update sound button on load
+if (isSoundEnabled) {
+  soundToggleBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i><span> Sound On</span>';
+} else {
+  soundToggleBtn.innerHTML = '<i class="bi bi-volume-mute-fill"></i><span> Sound Off</span>';
+}
+
+// Toggle sound on/off
+soundToggleBtn.addEventListener("click", () => {
+  isSoundEnabled = !isSoundEnabled;
+  localStorage.setItem("soundEnabled", isSoundEnabled);
+
+  if (isSoundEnabled) {
+    soundToggleBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i><span> Sound On</span>';
+  } else {
+    soundToggleBtn.innerHTML = '<i class="bi bi-volume-mute-fill"></i><span> Sound Off</span>';
+    // Stop any ongoing speech
+    if (currentSpeech) {
+      speechSynthesis.cancel();
+      currentSpeech = null;
+    }
+  }
+});
+
+// Function to speak text with CARTOON voice
+function speakText(text, speakerIcon) {
+  if (!isSoundEnabled) return;
+
+  // Stop any ongoing speech
+  if (currentSpeech) {
+    speechSynthesis.cancel();
+  }
+
+  // Clean text from HTML tags and special characters
+  const cleanText = text.replace(/<[^>]*>/g, '').replace(/[•★✨🤖😊🌟😄]/g, '');
+
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+
+  // 🎨 CARTOON VOICE SETTINGS - Fun and playful but slower!
+  utterance.rate = 1.0;      // Normal speed (slower but still clear)
+  utterance.pitch = 1.6;     // High pitch (squeaky cartoon voice)
+  utterance.volume = 1.0;
+  utterance.lang = 'en-US';
+
+  // Use selected voice if available
+  if (selectedVoice) {
+    utterance.voice = selectedVoice;
+  }
+
+  // Add speaking animation
+  if (speakerIcon) {
+    speakerIcon.classList.add('speaking');
+  }
+
+  utterance.onend = () => {
+    currentSpeech = null;
+    if (speakerIcon) {
+      speakerIcon.classList.remove('speaking');
+    }
+  };
+
+  utterance.onerror = () => {
+    currentSpeech = null;
+    if (speakerIcon) {
+      speakerIcon.classList.remove('speaking');
+    }
+  };
+
+  currentSpeech = utterance;
+  speechSynthesis.speak(utterance);
+}
+
+// Function to stop speech
+function stopSpeech() {
+  if (currentSpeech) {
+    speechSynthesis.cancel();
+    currentSpeech = null;
+  }
+}
+
+// Check if mobile
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+// --- ASSISTANT HINT ROTATION ---
+function rotateAssistantHint() {
+  assistantHint.style.opacity = '0';
+  setTimeout(() => {
+    assistantHint.textContent = assistantMessages[currentHintIndex];
+    assistantHint.style.opacity = '1';
+    currentHintIndex = (currentHintIndex + 1) % assistantMessages.length;
+  }, 500);
+}
+
+setInterval(rotateAssistantHint, 3000);
+
+// --- MP4 BOT CONTROL ---
+const botVideo = document.getElementById("botVideo");
+const botAnimation = document.getElementById("botAnimation");
+const botStates = {
+  hi: ["./mp4/hi1.mp4", "./mp4/hi2.mp4", "./mp4/hi3.mp4"],
+  thinking: "./mp4/think.mp4",
+  answer: "./mp4/found.mp4",
+  sleep: "./mp4/sleep.mp4",
+  drop: "./mp4/drop.mp4",
+  not_found: "./mp4/not_found.mp4"
+};
+
+let currentBotState = "hi";
+let hiVideoIndex = 0;
+let botTimer;
+
+function setBotState(state) {
+  if (currentBotState === state && state !== "hi") return;
+  currentBotState = state;
+
+  if (state === "hi") {
+    playHiSequence();
+  } else {
+    botVideo.onended = null;
+    botVideo.loop = true;
+    botVideo.src = botStates[state];
+    botVideo.play();
+  }
+}
+
+function playHiSequence() {
+  botVideo.loop = false;
+  botVideo.src = botStates.hi[hiVideoIndex];
+  botVideo.play();
+
+  botVideo.onended = () => {
+    hiVideoIndex = (hiVideoIndex + 1) % botStates.hi.length;
+    botVideo.src = botStates.hi[hiVideoIndex];
+    botVideo.play();
+  };
+}
+
+function resetBotTimer(state = "hi") {
+  clearTimeout(botTimer);
+  hiVideoIndex = 0;
+  setBotState(state);
+  botTimer = setTimeout(() => {
+    setBotState("sleep");
+  }, 60000);
+}
+
+function userTyping() {
+  if (currentBotState !== "thinking") {
+    setBotState("thinking");
+  }
+  clearTimeout(botTimer);
+  botTimer = setTimeout(() => setBotState("sleep"), 60000);
+}
+
+function botAnswered() {
+  setBotState("answer");
+  clearTimeout(botTimer);
+  botTimer = setTimeout(() => setBotState("sleep"), 60000);
+}
+
+function botNotFound() {
+  setBotState("not_found");
+  clearTimeout(botTimer);
+  botTimer = setTimeout(() => setBotState("sleep"), 60000);
+}
+
+// --- BOT ANIMATION CLICK EVENT ---
+botAnimation.addEventListener("click", () => {
+  currentBotState = "drop";
+  botVideo.loop = false;
+  botVideo.src = botStates.drop;
+  botVideo.play();
+
+  botVideo.onended = () => {
+    resetBotTimer("hi");
+  };
+
+  clearTimeout(botTimer);
+});
+
+// --- SIDEBAR TOGGLE ---
+toggleSidebarBtn.addEventListener("click", () => {
+  if (isMobile()) {
+    sidebar.classList.toggle("open");
+    sidebar.classList.remove("closed");
+    sidebarOverlay.classList.toggle("active");
+  } else {
+    sidebar.classList.toggle("closed");
+  }
+  updateInputPosition();
+});
+
+// Close sidebar when clicking overlay (mobile only)
+sidebarOverlay.addEventListener("click", () => {
+  sidebar.classList.remove("open");
+  sidebar.classList.add("closed");
+  sidebarOverlay.classList.remove("active");
+});
+
+// Handle window resize
+window.addEventListener("resize", () => {
+  if (!isMobile()) {
+    sidebarOverlay.classList.remove("active");
+    sidebar.classList.remove("open");
+  } else {
+    sidebar.classList.add("closed");
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("active");
+  }
+  updateInputPosition();
+});
+
+// --- INPUT POSITION ---
+function updateInputPosition() {
+  const messages = chatContainer.children;
+  if (messages.length === 0) {
+    inputWrapper.style.position = "absolute";
+    inputWrapper.style.top = "60%";
+    inputWrapper.style.bottom = "auto";
+    inputWrapper.style.transform = "translate(-50%, -50%)";
+  } else {
+    inputWrapper.style.position = "absolute";
+    inputWrapper.style.bottom = "20px";
+    inputWrapper.style.top = "auto";
+    inputWrapper.style.transform = "translateX(-50%)";
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+}
+
+// --- MESSAGES ---
+function addMessage(sender, text) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerHTML = `<div class="bubble">${text}</div>`;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  updateInputPosition();
+}
+
+function showTyping() {
+  const msg = document.createElement("div");
+  msg.classList.add("message", "bot");
+  msg.innerHTML = `<div class="bubble"><span class="typing">•••</span></div>`;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  updateInputPosition();
+  return msg;
+}
+
+// --- API Call ---
+async function askTiBot(question) {
+  try {
+    const res = await fetch(`/ask?question=${encodeURIComponent(question)}`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    return { intent: "error", answer: "⚠ Could not connect to TI Bot.", photo: null, not_found: false };
+  }
+}
+
+// --- CHAT SEND BUTTON ---
+sendBtn.addEventListener("click", async () => {
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  // Stop any ongoing speech when sending new message
+  stopSpeech();
+
+  addMessage("user", text);
+  assistantHint.style.display = "none";
+  userInput.value = "";
+  userTyping();
+  const typingMsg = showTyping();
+
+  // Close sidebar on mobile after sending
+  if (isMobile()) {
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("active");
+  }
+
+  const data = await askTiBot(text);
+  typingMsg.remove();
+  addBotResponse(data.answer, data.photo);
+
+  if (data.not_found) {
+    botNotFound();
+  } else {
+    botAnswered();
+  }
+});
+
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    sendBtn.click();
+  }
+  userTyping();
+});
+
+// --- VOICE RECOGNITION ---
+let recognition;
+let isRecording = false;
+
+if ("webkitSpeechRecognition" in window) {
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    micBtn.innerHTML = '<i class="bi bi-stop-circle-fill"></i>';
+    micBtn.style.background = "#dc2626";
+    document.getElementById("voiceEqualizer").style.display = "block";
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+    micBtn.style.background = "#ff9500";
+    document.getElementById("voiceEqualizer").style.display = "none";
+  };
+
+  recognition.onresult = async (event) => {
+    const spokenText = event.results[0][0].transcript;
+    userInput.value = spokenText;
+    sendBtn.click();
+  };
+} else {
+  console.log("Voice recognition not supported on this browser.");
+}
+
+micBtn.addEventListener("click", () => {
+  if (!recognition) {
+    alert("Your browser does not support voice recognition.");
+    return;
+  }
+
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    recognition.start();
+  }
+});
+
+// --- THEME TOGGLE ---
+if (localStorage.getItem("theme") === "light") {
+  document.body.classList.add("light");
+  themeBtn.innerHTML = '<i class="bi bi-sun"></i><span> Light Mode</span>';
+} else {
+  themeBtn.innerHTML = '<i class="bi bi-moon"></i><span> Dark Mode</span>';
+}
+
+themeBtn.addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  if (document.body.classList.contains("light")) {
+    themeBtn.innerHTML = '<i class="bi bi-sun"></i><span> Light Mode</span>';
+    localStorage.setItem("theme", "light");
+  } else {
+    themeBtn.innerHTML = '<i class="bi bi-moon"></i><span> Dark Mode</span>';
+    localStorage.setItem("theme", "dark");
+  }
+});
+
+// --- NEW CHAT ---
+newChatBtn.addEventListener("click", () => {
+  stopSpeech(); // Stop speech when starting new chat
+  const item = document.createElement("button");
+  item.innerHTML = '<i class="bi bi-chat"></i><span> Chat ' + chatCount++ + '</span>';
+  chatHistory.appendChild(item);
+  chatContainer.innerHTML = "";
+  updateInputPosition();
+  assistantHint.style.display = "block";
+  setRandomAssistantHint();
+
+  if (isMobile()) {
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("active");
+  }
+});
+
+// --- CLEAR CHATS ---
+clearChatsBtn.addEventListener("click", () => {
+  stopSpeech(); // Stop speech when clearing chats
+  chatHistory.innerHTML = "";
+  chatContainer.innerHTML = "";
+  chatCount = 1;
+  updateInputPosition();
+  assistantHint.style.display = "block";
+  setRandomAssistantHint();
+
+  if (isMobile()) {
+    sidebar.classList.remove("open");
+    sidebarOverlay.classList.remove("active");
+  }
+});
+
+// --- ASSISTANT HINT ---
+function setRandomAssistantHint() {
+  assistantHint.textContent = assistantMessages[0];
+  currentHintIndex = 1;
+}
+
+// --- INIT ---
+updateInputPosition();
+resetBotTimer();
+setRandomAssistantHint();
+rotateAssistantHint();
+
+// --- Add Bot Response with Photo and Speaker ---
+function addBotResponse(text, photo) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", "bot");
+
+  let bubbleContent = text;
+
+  if (photo) {
+    bubbleContent += `<br><a href="${photo}" target="_blank"><img src="${photo}" style="max-width:210px; margin-top:8px; border-radius:10px; display:block; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`;
+  }
+
+  msg.innerHTML = `<div class="bubble">${bubbleContent}<i class="bi bi-volume-up speaker-icon"></i></div>`;
+
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  updateInputPosition();
+
+  // Get the speaker icon and add click event
+  const bubble = msg.querySelector('.bubble');
+  const speakerIcon = bubble.querySelector('.speaker-icon');
+
+  // Auto-play speech for bot response
+  if (isSoundEnabled) {
+    speakText(text, speakerIcon);
+  }
+
+  // Click to replay/stop speech
+  speakerIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    if (currentSpeech && speakerIcon.classList.contains('speaking')) {
+      // Stop if currently speaking
+      stopSpeech();
+      speakerIcon.classList.remove('speaking');
+    } else {
+      // Speak the text
+      speakText(text, speakerIcon);
+    }
+  });
+}
+
+</script>
+
+</body>
+</html>
