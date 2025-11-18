@@ -6,6 +6,7 @@
 <title>TI BOT</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="./config.js"></script>
 
 <style>
 body {
@@ -730,7 +731,7 @@ const assistantMessages = [
 let currentHintIndex = 0;
 
 // ✅ TEXT-TO-SPEECH SETUP
-let isSoundEnabled = localStorage.getItem("soundEnabled") !== "false"; // Default ON
+let isSoundEnabled = localStorage.getItem("soundEnabled") !== "false";
 let currentSpeech = null;
 let availableVoices = [];
 let selectedVoice = null;
@@ -739,8 +740,6 @@ let selectedVoice = null;
 function loadVoices() {
   availableVoices = speechSynthesis.getVoices();
 
-  // Try to find a cute/feminine voice
-  // Priority: Female voices with higher quality
   const preferredVoices = [
     'Google UK English Female',
     'Google US English Female',
@@ -753,7 +752,6 @@ function loadVoices() {
     'Fiona'
   ];
 
-  // First, try to find preferred voices
   for (let prefName of preferredVoices) {
     selectedVoice = availableVoices.find(voice =>
       voice.name.includes(prefName)
@@ -761,7 +759,6 @@ function loadVoices() {
     if (selectedVoice) break;
   }
 
-  // If no preferred voice found, try to find any female voice
   if (!selectedVoice) {
     selectedVoice = availableVoices.find(voice =>
       voice.name.toLowerCase().includes('female') ||
@@ -772,7 +769,6 @@ function loadVoices() {
     );
   }
 
-  // Fallback to default voice
   if (!selectedVoice && availableVoices.length > 0) {
     selectedVoice = availableVoices[0];
   }
@@ -780,20 +776,17 @@ function loadVoices() {
   console.log('Selected voice:', selectedVoice ? selectedVoice.name : 'Default');
 }
 
-// Load voices on page load and when they change
 loadVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) {
   speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-// Update sound button on load
 if (isSoundEnabled) {
   soundToggleBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i><span> Sound On</span>';
 } else {
   soundToggleBtn.innerHTML = '<i class="bi bi-volume-mute-fill"></i><span> Sound Off</span>';
 }
 
-// Toggle sound on/off
 soundToggleBtn.addEventListener("click", () => {
   isSoundEnabled = !isSoundEnabled;
   localStorage.setItem("soundEnabled", isSoundEnabled);
@@ -802,7 +795,6 @@ soundToggleBtn.addEventListener("click", () => {
     soundToggleBtn.innerHTML = '<i class="bi bi-volume-up-fill"></i><span> Sound On</span>';
   } else {
     soundToggleBtn.innerHTML = '<i class="bi bi-volume-mute-fill"></i><span> Sound Off</span>';
-    // Stop any ongoing speech
     if (currentSpeech) {
       speechSynthesis.cancel();
       currentSpeech = null;
@@ -810,32 +802,26 @@ soundToggleBtn.addEventListener("click", () => {
   }
 });
 
-// Function to speak text with CARTOON voice
 function speakText(text, speakerIcon) {
   if (!isSoundEnabled) return;
 
-  // Stop any ongoing speech
   if (currentSpeech) {
     speechSynthesis.cancel();
   }
 
-  // Clean text from HTML tags and special characters
   const cleanText = text.replace(/<[^>]*>/g, '').replace(/[•★✨🤖😊🌟😄]/g, '');
 
   const utterance = new SpeechSynthesisUtterance(cleanText);
 
-  // 🎨 CARTOON VOICE SETTINGS - Fun and playful but slower!
-  utterance.rate = 1.0;      // Normal speed (slower but still clear)
-  utterance.pitch = 1.6;     // High pitch (squeaky cartoon voice)
+  utterance.rate = 1.0;
+  utterance.pitch = 1.6;
   utterance.volume = 1.0;
   utterance.lang = 'en-US';
 
-  // Use selected voice if available
   if (selectedVoice) {
     utterance.voice = selectedVoice;
   }
 
-  // Add speaking animation
   if (speakerIcon) {
     speakerIcon.classList.add('speaking');
   }
@@ -858,7 +844,6 @@ function speakText(text, speakerIcon) {
   speechSynthesis.speak(utterance);
 }
 
-// Function to stop speech
 function stopSpeech() {
   if (currentSpeech) {
     speechSynthesis.cancel();
@@ -866,12 +851,10 @@ function stopSpeech() {
   }
 }
 
-// Check if mobile
 function isMobile() {
   return window.innerWidth <= 768;
 }
 
-// --- ASSISTANT HINT ROTATION ---
 function rotateAssistantHint() {
   assistantHint.style.opacity = '0';
   setTimeout(() => {
@@ -954,7 +937,6 @@ function botNotFound() {
   botTimer = setTimeout(() => setBotState("sleep"), 60000);
 }
 
-// --- BOT ANIMATION CLICK EVENT ---
 botAnimation.addEventListener("click", () => {
   currentBotState = "drop";
   botVideo.loop = false;
@@ -968,7 +950,6 @@ botAnimation.addEventListener("click", () => {
   clearTimeout(botTimer);
 });
 
-// --- SIDEBAR TOGGLE ---
 toggleSidebarBtn.addEventListener("click", () => {
   if (isMobile()) {
     sidebar.classList.toggle("open");
@@ -980,14 +961,12 @@ toggleSidebarBtn.addEventListener("click", () => {
   updateInputPosition();
 });
 
-// Close sidebar when clicking overlay (mobile only)
 sidebarOverlay.addEventListener("click", () => {
   sidebar.classList.remove("open");
   sidebar.classList.add("closed");
   sidebarOverlay.classList.remove("active");
 });
 
-// Handle window resize
 window.addEventListener("resize", () => {
   if (!isMobile()) {
     sidebarOverlay.classList.remove("active");
@@ -1000,7 +979,6 @@ window.addEventListener("resize", () => {
   updateInputPosition();
 });
 
-// --- INPUT POSITION ---
 function updateInputPosition() {
   const messages = chatContainer.children;
   if (messages.length === 0) {
@@ -1017,7 +995,6 @@ function updateInputPosition() {
   }
 }
 
-// --- MESSAGES ---
 function addMessage(sender, text) {
   const msg = document.createElement("div");
   msg.classList.add("message", sender);
@@ -1037,23 +1014,24 @@ function showTyping() {
   return msg;
 }
 
-// --- API Call ---
+// --- API Call with CONFIG support ---
 async function askTiBot(question) {
   try {
-    const res = await fetch(`/ask?question=${encodeURIComponent(question)}`);
+    // Use config.js if available, otherwise fallback to relative path
+    const apiUrl = window.CONFIG ? window.CONFIG.getEndpoint('/api/ask') : '/api/ask';
+    const res = await fetch(`${apiUrl}?question=${encodeURIComponent(question)}`);
     const data = await res.json();
     return data;
   } catch (err) {
-    return { intent: "error", answer: "⚠ Could not connect to TI Bot.", photo: null, not_found: false };
+    console.error('API Error:', err);
+    return { intent: "error", answer: "⚠ Could not connect to TI Bot. Please check your internet connection.", photo: null, not_found: false };
   }
 }
 
-// --- CHAT SEND BUTTON ---
 sendBtn.addEventListener("click", async () => {
   const text = userInput.value.trim();
   if (!text) return;
 
-  // Stop any ongoing speech when sending new message
   stopSpeech();
 
   addMessage("user", text);
@@ -1062,7 +1040,6 @@ sendBtn.addEventListener("click", async () => {
   userTyping();
   const typingMsg = showTyping();
 
-  // Close sidebar on mobile after sending
   if (isMobile()) {
     sidebar.classList.remove("open");
     sidebarOverlay.classList.remove("active");
@@ -1153,7 +1130,7 @@ themeBtn.addEventListener("click", () => {
 
 // --- NEW CHAT ---
 newChatBtn.addEventListener("click", () => {
-  stopSpeech(); // Stop speech when starting new chat
+  stopSpeech();
   const item = document.createElement("button");
   item.innerHTML = '<i class="bi bi-chat"></i><span> Chat ' + chatCount++ + '</span>';
   chatHistory.appendChild(item);
@@ -1170,7 +1147,7 @@ newChatBtn.addEventListener("click", () => {
 
 // --- CLEAR CHATS ---
 clearChatsBtn.addEventListener("click", () => {
-  stopSpeech(); // Stop speech when clearing chats
+  stopSpeech();
   chatHistory.innerHTML = "";
   chatContainer.innerHTML = "";
   chatCount = 1;
@@ -1213,25 +1190,20 @@ function addBotResponse(text, photo) {
   chatContainer.scrollTop = chatContainer.scrollHeight;
   updateInputPosition();
 
-  // Get the speaker icon and add click event
   const bubble = msg.querySelector('.bubble');
   const speakerIcon = bubble.querySelector('.speaker-icon');
 
-  // Auto-play speech for bot response
   if (isSoundEnabled) {
     speakText(text, speakerIcon);
   }
 
-  // Click to replay/stop speech
   speakerIcon.addEventListener('click', (e) => {
     e.stopPropagation();
 
     if (currentSpeech && speakerIcon.classList.contains('speaking')) {
-      // Stop if currently speaking
       stopSpeech();
       speakerIcon.classList.remove('speaking');
     } else {
-      // Speak the text
       speakText(text, speakerIcon);
     }
   });
