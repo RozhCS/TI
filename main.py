@@ -16,10 +16,9 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Create FastAPI app FIRST
-
 app = FastAPI(title="TI-Bot (TIU Smart Assistant)")
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# CORS - ALLOW ALL ORIGINS (Important for Render deployment)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,26 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# STATIC MOUNTS (below app creation)
-photo_dir = os.path.join(os.getcwd(), "Staff_Photos_V2")
-app.mount("/photos", StaticFiles(directory=photo_dir), name="photos")
-
-frontend_dir = os.path.join(os.getcwd(), "frontend")
-app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-
-mp4_dir = os.path.join(os.getcwd(), "frontend/mp4")
-app.mount("/mp4", StaticFiles(directory=mp4_dir), name="mp4")
-
-
-
-# ---- Serve Photos ----
-photo_dir = os.path.join(os.getcwd(), "Staff_Photos_V2")
-if os.path.exists(photo_dir):
-    print(f"✅ Serving photos from: {photo_dir}")
-else:
-    print("⚠️ Photo folder not found!")
-app.mount("/photos", StaticFiles(directory=photo_dir), name="photos")
 
 # ---- LOAD DATASETS ----
 rooms = pd.read_excel("Room_Dataset_V2.xlsx").fillna("")
@@ -128,7 +107,8 @@ def creator_answer():
         "and to support digital transformation and modern technology in education. "
         "TI-BOT is the first university AI assistant in Kurdistan."
     )
-    photo_url = "http://127.0.0.1:8001/photos/ti_bot_team.jpg"
+    # Use relative path for deployment
+    photo_url = "/photos/ti_bot_team.jpg"
     return {"text": text, "photo": photo_url}
 
 # ---- ABOUT BOT ANSWER ----
@@ -141,7 +121,7 @@ def about_bot_answer(q):
         "Rako Omer and Aryan Abdullah. Together, they designed and developed me as a modern AI solution to support "
         "digital transformation at TIU-Sulaimani — and to make university services faster, smarter, and more accessible."
     )
-    team_photo = "http://127.0.0.1:8001/photos/ti_bot_team.jpg"
+    team_photo = "/photos/ti_bot_team.jpg"
     return {"text": text, "photo": team_photo}
 
 # ---- UNIVERSITY ANSWER ----
@@ -153,7 +133,7 @@ def university_answer(q):
         "across Engineering, Health Sciences, Architecture, Education, Computer Science, and Business, all taught "
         "in English to meet global academic and industrial standards."
     )
-    photo_url = "http://127.0.0.1:8001/photos/tiu-campus.jpg"
+    photo_url = "/photos/tiu-campus.jpg"
     return {"text": text, "photo": photo_url}
 
 # ---- STAFF ANSWER ----
@@ -195,7 +175,7 @@ def staff_answer(q):
 
     photo_url = None
     if photo_name and photo_name.lower() not in ["nan", "", "none"]:
-        photo_url = f"http://127.0.0.1:8001/photos/{photo_name}"
+        photo_url = f"/photos/{photo_name}"
 
     return {"text": text, "photo": photo_url}
 
@@ -463,18 +443,33 @@ def ask_router(question: str):
     return {"intent": intent, "answer": friendly, "photo": None, "not_found": not_found}
 
 # ---- API ENDPOINT ----
-@app.get("/ask")
+@app.get("/api/ask")
 def ask(question: str):
     return ask_router(question)
 
-# ---- SERVE FRONTEND (THIS MUST BE LAST) ----
-from fastapi.staticfiles import StaticFiles
-import os
+# Health check endpoint
+@app.get("/api/health")
+def health_check():
+    return {"status": "healthy"}
 
+# ---- STATIC MOUNTS (AFTER API ENDPOINTS) ----
+photo_dir = os.path.join(os.getcwd(), "Staff_Photos_V2")
+if os.path.exists(photo_dir):
+    print(f"✅ Serving photos from: {photo_dir}")
+    app.mount("/photos", StaticFiles(directory=photo_dir), name="photos")
+else:
+    print("⚠️ Photo folder not found!")
+
+mp4_dir = os.path.join(os.getcwd(), "frontend/mp4")
+if os.path.exists(mp4_dir):
+    app.mount("/mp4", StaticFiles(directory=mp4_dir), name="mp4")
+
+# ---- SERVE FRONTEND (THIS MUST BE LAST) ----
 frontend_dir = os.path.join(os.getcwd(), "frontend")
-app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 
 # ---- RUN ----
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
