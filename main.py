@@ -462,8 +462,17 @@ def ask_router(question: str):
     not_found = is_not_found_answer(friendly)
     return {"intent": intent, "answer": friendly, "photo": None, "not_found": not_found}
 
-# ---- ENDPOINT ----
-app.add_api_route("/ask", lambda question: ask_router(question), methods=["GET"])
+# ---- API ENDPOINT ----
+@app.get("/ask")
+def ask(question: str):
+    return ask_router(question)
+
+# ---- SERVE FRONTEND (THIS MUST BE LAST) ----
+from fastapi.staticfiles import StaticFiles
+import os
+
+frontend_dir = os.path.join(os.getcwd(), "frontend")
+app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 
 # ---- RUN ----
 if __name__ == "__main__":
