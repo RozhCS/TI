@@ -2,35 +2,23 @@
 # Requirements:
 # pip install fastapi uvicorn pandas python-dotenv openpyxl thefuzz openai
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from openai import OpenAI
-import pandas as pd
-import re
-from thefuzz import fuzz
 from dotenv import load_dotenv
-import os
-import webbrowser
-import random
+import pandas as pd
+from thefuzz import fuzz
+import random, os, re
+from openai import OpenAI
 
-# Serve static files (HTML, CSS, JS, images, videos)
-app.mount("/mp4", StaticFiles(directory="mp4"), name="mp4")
-app.mount("/image", StaticFiles(directory="image"), name="image")
-app.mount("/about_us", StaticFiles(directory="about_us"), name="about_us")
-
-# Serve index.html at root
-@app.get("/")
-async def read_root():
-    return FileResponse("index.html")
-
-# ---- SETUP ----
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-app = FastAPI(title="TI-Bot (Service + Room + Dept Version)")
 
-from fastapi.middleware.cors import CORSMiddleware
+# Create FastAPI app FIRST
+app = FastAPI(title="TI-Bot (TIU Smart Assistant)")
 
+# Allow frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -38,6 +26,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# STATIC FILES
+app.mount("/photos", StaticFiles(directory="Staff_Photos_V2"), name="photos")
+app.mount("/mp4", StaticFiles(directory="frontend/mp4"), name="mp4")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+
 
 # ---- Serve Photos ----
 photo_dir = os.path.join(os.getcwd(), "Staff_Photos_V2")
