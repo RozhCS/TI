@@ -16,9 +16,10 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Create FastAPI app FIRST
-app = FastAPI(title="TI-Bot (TIU Smart Assistant)")
 
-# Allow frontend to talk to backend
+app = FastAPI(title="TI-Bot (TIU Smart Assistant)")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,10 +28,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# STATIC FILES
-app.mount("/photos", StaticFiles(directory="Staff_Photos_V2"), name="photos")
-app.mount("/mp4", StaticFiles(directory="frontend/mp4"), name="mp4")
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+# STATIC MOUNTS (below app creation)
+photo_dir = os.path.join(os.getcwd(), "Staff_Photos_V2")
+app.mount("/photos", StaticFiles(directory=photo_dir), name="photos")
+
+frontend_dir = os.path.join(os.getcwd(), "frontend")
+app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+
+mp4_dir = os.path.join(os.getcwd(), "frontend/mp4")
+app.mount("/mp4", StaticFiles(directory=mp4_dir), name="mp4")
+
 
 
 # ---- Serve Photos ----
